@@ -136,6 +136,7 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
       cellobj.value = cell
       align = {
         "vertical": "top",
+        "horizontal": "left",
         "wrapText": True
       }
       cellobj.alignment = styles.Alignment(**align) 
