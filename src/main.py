@@ -130,7 +130,7 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
       cellobj = ws.cell(r + 1, c + 1)
       if type(cell) is list:
         cell = "\n".join(cell)
-      cellobj.value = cell
+      cellobj.value = expandvars(cell, config["Consts"])
       align = {
         "vertical": "top",
         "horizontal": "justify"
@@ -155,6 +155,11 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
   if not path.parent.exists(): path.parent.mkdir()
   wb.save(path)
   
+def expandvars(text: str, consts: dict[str,str]):
+  for n, v in consts.items():
+    text = text.replace("{{" +n + "}}", v)
+  return text
+
 if __name__ == "__main__":
   p = ArgumentParser(description="Test Sheet Creation Tool")
   p.add_argument("tests", type=str, help="Markdown file that defines a test item.")
