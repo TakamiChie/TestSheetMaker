@@ -16,6 +16,22 @@ class TestGenerateTestlist(unittest.TestCase):
     self.assertEqual(data[0]["items"], ["test", "testb", "testc"])
     self.assertEqual(data[0]["exams"], {"aaa": ["bbb"], "bbb": ["ccc"]})
 
+  def test_simple_blankline(self):
+    testdata = """
+    # test
+    ## testb
+    ### testc
+    :: aaa
+    bbb
+
+    :: bbb
+    ccc
+    """
+    data = main.generate_testlist(testdata)
+    self.assertEqual(len(data), 1)
+    self.assertEqual(data[0]["items"], ["test", "testb", "testc"])
+    self.assertEqual(data[0]["exams"], {"aaa": ["bbb"], "bbb": ["ccc"]})
+
   def test_double(self):
     testdata = """
     # test

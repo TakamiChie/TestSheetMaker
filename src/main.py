@@ -56,6 +56,9 @@ def generate_testlist(lines: str) -> list[dict[list[str] | dict[str]]]:
         textbuf = previoustest[section]
       else:
         textbuf = []
+    elif re.match(r"^\s*$", line):
+      # ignore blank line.
+      pass
     else:
       textbuf += [line.strip()]
   if textbuf != [] and section != "":
