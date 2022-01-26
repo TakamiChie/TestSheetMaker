@@ -130,10 +130,8 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
       cellobj.value = expandvars(cell, config["Consts"])
       align = {
         "vertical": "top",
-        "horizontal": "justify"
+        "wrapText": True
       }
-      if "\n" in cell:
-        align["wrapText"] = True
       cellobj.alignment = styles.Alignment(**align) 
       if r == 0:
         # extension width
