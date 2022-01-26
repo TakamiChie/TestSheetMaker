@@ -127,7 +127,7 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
       cellobj = ws.cell(r + 1, c + 1)
       if type(cell) is list:
         cell = "\n".join(cell)
-      cellobj.value = expandvars(cell, config["Consts"])
+      cellobj.value = cell
       align = {
         "vertical": "top",
         "wrapText": True
@@ -150,9 +150,13 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
   if not path.parent.exists(): path.parent.mkdir()
   wb.save(path)
   
-def expandvars(text: str, consts: dict[str,str]):
-  for n, v in consts.items():
-    text = text.replace("{{" +n + "}}", v)
+def expandvars(text: str | list[list[str]], consts: dict[str,str]):
+  if type(text) is list:
+    for i, item in enumerate(text):
+      text[i] = expandvars(item, consts)
+  else:
+    for n, v in consts.items():
+      text = text.replace("{{" +n + "}}", v)
   return text
 
 if __name__ == "__main__":
