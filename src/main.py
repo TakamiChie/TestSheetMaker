@@ -125,6 +125,12 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
   for r, line in enumerate(cells):
     for c, cell in enumerate(line):
       cellobj = ws.cell(r + 1, c + 1)
+      # extension width
+      calcsize = (len(cell if type(cell) is str else max(cell, key=len)) + 2) * 1.4
+      dimensions = ws.column_dimensions[cellobj.column_letter]
+      if not "\n" in cell and dimensions.width < calcsize:
+          dimensions.width = calcsize
+      # set text
       if type(cell) is list:
         cell = "\n".join(cell)
       cellobj.value = cell
@@ -134,11 +140,6 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
       }
       cellobj.alignment = styles.Alignment(**align) 
       if r == 0:
-        # extension width
-        calcsize = (len(cell) + 2) * 1.4
-        dimensions = ws.column_dimensions[cellobj.column_letter]
-        if not "\n" in cell and dimensions.width < calcsize:
-           dimensions.width = calcsize
         # set style
         cellobj.fill = headdesign
         cellobj.font = headfont
@@ -171,5 +172,6 @@ if __name__ == "__main__":
 
   exams = generate_testlist(lines)
   cells = cells_normalization(config["Headers"]["TestItemsLabel"], exams)
+  cells = expandvars(cells, config["Consts"])
   create_excel(config, cells, path=Path(args.out))
 
