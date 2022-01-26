@@ -14,6 +14,7 @@ def generate_testlist(lines: str) -> list[dict[list[str] | dict[str]]]:
   level = 0
   examsmap = []
   itemmap = []
+  previoustest = {}
   currenttest = {}
   section = ""
   textbuf = []
@@ -41,15 +42,20 @@ def generate_testlist(lines: str) -> list[dict[list[str] | dict[str]]]:
       else:
         raise Exception("Incorrect test vote data.")
       section = ""
+      if currenttest != {}:
+        previoustest = currenttest.copy()
       currenttest = {}
       textbuf = []
-    elif m := re.match(r"^\s*::\s*(.*)$", line):
+    elif m := re.match(r"^\s*::\s*(.*?)\s*(&&)?$", line):
       # change section
       if textbuf != [] and section != "":
         currenttest[section] = textbuf
       # new section
       section = m[1]
-      textbuf = []
+      if m[2] == "&&" and section in previoustest:
+        textbuf = previoustest[section]
+      else:
+        textbuf = []
     else:
       textbuf += [line.strip()]
   if textbuf != [] and section != "":

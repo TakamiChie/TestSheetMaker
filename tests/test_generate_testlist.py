@@ -55,6 +55,26 @@ class TestGenerateTestlist(unittest.TestCase):
     self.assertEqual(data[0]["items"], ["test", "teste", "testf"])
     self.assertEqual(data[0]["exams"], {"aaa": ["bbb"], "bbb": ["ccc"]})
 
+  def test_ampersand(self):
+    testdata = """
+    # test
+    ## testb
+    ### testc
+    :: aaa
+    bbb
+    :: bbb
+    ccc
+    ## teste
+    ### testf
+    :: aaa &&
+    :: bbb
+    ddd"""
+    data = main.generate_testlist(testdata)
+    self.assertEqual(len(data), 2)
+    self.assertEqual(data[0]["items"], ["test", "testb", "testc"])
+    self.assertEqual(data[0]["exams"], {"aaa": ["bbb"], "bbb": ["ccc"]})
+    self.assertEqual(data[1]["items"], ["test", "teste", "testf"])
+    self.assertEqual(data[1]["exams"], {"aaa": ["bbb"], "bbb": ["ddd"]})
 
   def test_in_middle_with_not_implemented(self):
     testdata = """
