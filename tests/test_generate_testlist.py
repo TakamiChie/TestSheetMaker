@@ -38,6 +38,37 @@ class TestGenerateTestlist(unittest.TestCase):
     self.assertEqual(data[1]["items"], ["test", "testd", "teste"])
     self.assertEqual(data[1]["exams"], {"aaa": ["ddd"], "bbb": ["eee"]})
 
+  def test_triple(self):
+    testdata = """
+    # test
+    ## testb
+    ### testc
+    :: aaa
+    bbb
+    :: bbb
+    ccc
+    ## testd
+    ### teste
+    :: aaa
+    ddd
+    :: bbb
+    eee
+    # testf
+    ## testg
+    ### testh
+    :: aaa
+    fff
+    :: bbb
+    ggg"""
+    data = main.generate_testlist(testdata)
+    self.assertEqual(len(data), 3)
+    self.assertEqual(data[0]["items"], ["test", "testb", "testc"])
+    self.assertEqual(data[0]["exams"], {"aaa": ["bbb"], "bbb": ["ccc"]})
+    self.assertEqual(data[1]["items"], ["test", "testd", "teste"])
+    self.assertEqual(data[1]["exams"], {"aaa": ["ddd"], "bbb": ["eee"]})
+    self.assertEqual(data[2]["items"], ["testf", "testg", "testh"])
+    self.assertEqual(data[2]["exams"], {"aaa": ["fff"], "bbb": ["ggg"]})
+
   def test_in_middle(self):
     testdata = """
     # test

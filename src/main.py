@@ -38,7 +38,7 @@ def generate_testlist(lines: str) -> list[dict[list[str] | dict[str]]]:
       elif level > ml:
         itemmap = itemmap[0:ml]
         itemmap[-1] = m[2]
-        level-=1
+        level=ml
       else:
         raise Exception("Incorrect test vote data.")
       section = ""
