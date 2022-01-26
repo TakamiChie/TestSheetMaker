@@ -1,0 +1,17 @@
+Headers:
+  TestResult:
+    PrintCount: 2
+    Labels:
+      - 実施担当
+      - 確認担当
+      - 実施日
+      - 結果
+  TestItemsLabel:
+    - ステップ
+    - 中項目
+    - 小項目
+    - 詳細項目
+  BackColor: "002060"
+  TextColor: "FFFFFF"
+Sheet:
+  Name: "試験票"
