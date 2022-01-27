@@ -132,6 +132,7 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
       cellobj.font = headfont
   # output cells
   for r, line in enumerate(cells):
+    print(f"> {line[0]}")
     for c, cell in enumerate(line):
       cellobj = ws.cell(r + START_ROW, c + 1)
       # extension width
@@ -176,6 +177,7 @@ if __name__ == "__main__":
   p.add_argument("-o", "--out", required=True, type=str, help="Excel file output destination.")
   p.add_argument("-c", "--config", default="sample/config.yml", type=str, help="Configured file that defines basic information of the test vote.")
   args = p.parse_args()
+  print("> prepare")
 
   with open(args.config, mode="r", encoding="utf-8") as f: config = yaml.safe_load(f)
   with open(args.tests, mode="r", encoding="utf-8") as f: lines = f.read()
@@ -185,4 +187,5 @@ if __name__ == "__main__":
   if "Consts" in config:
     cells = expandvars(cells, config["Consts"])
   create_excel(config, cells, path=Path(args.out))
+  print("> finished!")
 
