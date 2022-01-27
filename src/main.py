@@ -128,6 +128,11 @@ def cells_normalization(testitemslabel: list[str], examsmap: list[dict[list[str]
   for h in header.keys():
     line.append(h)
   lines.insert(0, line)
+
+  # Leveling of the number of arrays
+  l = len(max(lines, key=len))
+  for i, line in enumerate(lines):
+    if len(line) < l: lines[i] += [""] * (l - len(line))
   return lines
   
 def add_examcells(examinfo: dict[str | int | list[str]], cells: list[list[str]]):

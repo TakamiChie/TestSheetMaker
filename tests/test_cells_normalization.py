@@ -30,7 +30,7 @@ class TestCellsNormalization(unittest.TestCase):
     data = main.cells_normalization(headers, testdata)
     self.assertEquals(len(data), 3)
     self.assertEquals(data[0], ["No", "l", "m", "s", "aaa", "bbb", "ddd"])
-    self.assertEquals(data[1], ["1-1-1", "test", "testb", "testc", "bbb", "ccc"])
+    self.assertEquals(data[1], ["1-1-1", "test", "testb", "testc", "bbb", "ccc", ""])
     self.assertEquals(data[2], ["1-2-1", "test", "testd", "", "bbb", "ccc", "aaa"])
 
   def test_error_headers(self):
