@@ -107,6 +107,15 @@ def cells_normalization(testitemslabel: list[str], examsmap: list[dict[list[str]
   lines.insert(0, line)
   return lines
   
+def add_examcells(examinfo: dict[str | int | list[str]], cells: list[list[str]]):
+  ii = len(max(cells, key=len))
+  for c in range(examinfo["PrintCount"]):
+    for l in examinfo["Labels"]:
+      for i, line in enumerate(cells):
+        line.insert(ii, l if i == 0 else "")
+        ii += 1
+  return cells
+  
 def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
   START_ROW = 2
   wb = openpyxl.Workbook()
@@ -119,11 +128,10 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
   border = styles.Border(side, side, side, side)
   # fill header
   if "TestResult" in config["Headers"]:
+    lc = len(config["Headers"]["TestResult"]["Labels"])
     for c in range(config["Headers"]["TestResult"]["PrintCount"]):
-      for l in config["Headers"]["TestResult"]["Labels"]:
-        cells[0].append(f"{c+1}:{l}")
-      sc = len(cells[0]) - len(config["Headers"]["TestResult"]["Labels"]) + 1
-      ec = len(cells[0])
+      sc = cells[0].index(config["Headers"]["TestResult"]["Labels"][0]) + c * lc + 1
+      ec = sc + lc - 1
       cellobj = ws.cell(1, sc)
       cellobj.value = config["Headers"]["TestResult"]["Title"].format(c+1)
       ws.merge_cells(f"{cellobj.column_letter}1:{ws.cell(1, ec).column_letter}1")
@@ -161,7 +169,7 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
 
   if not path.parent.exists(): path.parent.mkdir()
   wb.save(path)
-  
+
 def expandvars(text: str | list[list[str]], consts: dict[str,str]):
   if type(text) is list:
     for i, item in enumerate(text):
@@ -184,6 +192,8 @@ if __name__ == "__main__":
 
   exams = generate_testlist(lines)
   cells = cells_normalization(config["Headers"]["TestItemsLabel"], exams)
+  if "TestResult" in config["Headers"]:
+    cells = add_examcells(config["Headers"]["TestResult"], cells)
   if "Consts" in config:
     cells = expandvars(cells, config["Consts"])
   create_excel(config, cells, path=Path(args.out))
