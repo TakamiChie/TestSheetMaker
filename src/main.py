@@ -108,6 +108,7 @@ def cells_normalization(testitemslabel: list[str], examsmap: list[dict[list[str]
   return lines
   
 def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
+  START_ROW = 2
   wb = openpyxl.Workbook()
   ws = wb.worksheets[-1]
   ws.title = config["Sheet"]["Name"]
@@ -121,11 +122,18 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
     for c in range(config["Headers"]["TestResult"]["PrintCount"]):
       for l in config["Headers"]["TestResult"]["Labels"]:
         cells[0].append(f"{c+1}:{l}")
-      ws.cell(1, c + len(cells[0])).value = f"{c+1}"
+      sc = len(cells[0]) - len(config["Headers"]["TestResult"]["Labels"]) + 1
+      ec = len(cells[0])
+      cellobj = ws.cell(1, sc)
+      cellobj.value = config["Headers"]["TestResult"]["Title"].format(c+1)
+      ws.merge_cells(f"{cellobj.column_letter}1:{ws.cell(1, ec).column_letter}1")
+      cellobj.alignment = styles.Alignment(horizontal="center") 
+      cellobj.fill = headdesign
+      cellobj.font = headfont
   # output cells
   for r, line in enumerate(cells):
     for c, cell in enumerate(line):
-      cellobj = ws.cell(r + 2, c + 1)
+      cellobj = ws.cell(r + START_ROW, c + 1)
       # extension width
       calcsize = (len(cell if type(cell) is str else max(cell, key=len)) + 2) * 1.4
       dimensions = ws.column_dimensions[cellobj.column_letter]
@@ -148,7 +156,7 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
       cellobj.border = border
     if len(cells[0]) - len(line) > 0:
       for c in range(len(cells[0]) - len(line)):
-        ws.cell(r + 1, c + 1 + len(line)).border = border
+        ws.cell(r + START_ROW, c + 1 + len(line)).border = border
 
   if not path.parent.exists(): path.parent.mkdir()
   wb.save(path)

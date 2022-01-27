@@ -1,6 +1,7 @@
 Headers:
   TestResult:
     PrintCount: 2
+    Title: "{}回目"
     Labels:
       - 実施担当
       - 確認担当
