@@ -8,6 +8,17 @@ import openpyxl.styles as styles
 import yaml
 
 def generate_testlist(lines: str) -> list[dict[list[str] | dict[str]]]:
+  """
+  Markdownデータより、試験項目用リストを作成する。
+  
+  Parameters
+  ----
+  lines: 試験項目データを含むMarkdownデータ
+
+  Returns
+  ----
+  試験項目を含む構造体
+  """
   level = 0
   examsmap = []
   itemmap = []
@@ -68,6 +79,18 @@ def generate_testlist(lines: str) -> list[dict[list[str] | dict[str]]]:
   return examsmap
 
 def cells_normalization(testitemslabel: list[str], examsmap: list[dict[list[str] | dict[str]]]) -> list[list[str]]:
+  """
+  試験データの正規化を行う
+  
+  Parameters
+  ----
+  testitemslabel: 試験項目タイトルを示すラベル
+  examsmap: generate_testlistメソッドの出力値
+
+  Returns
+  ----
+  試験項目を示すテーブルデータ。
+  """
   tilcount = len(testitemslabel)
   lines = []
   header = {}
@@ -108,6 +131,20 @@ def cells_normalization(testitemslabel: list[str], examsmap: list[dict[list[str]
   return lines
   
 def add_examcells(examinfo: dict[str | int | list[str]], cells: list[list[str]]):
+  """
+  試験実施確認用セルを作成する
+
+  Parameters
+  ----
+  examinfo: 試験実施確認用のデータを示す構造体
+    PrintCount: Excel表に出力する試験実施の試行回数。試行回数分の列が追加される
+    Labels: 試験実施のラベル(配列)
+  cells: cells_normalizationの出力値
+
+  Returns
+  ----
+  試験項目を示すテーブルデータ。
+  """
   ii = len(max(cells, key=len))
   for c in range(examinfo["PrintCount"]):
     for l in examinfo["Labels"]:
@@ -117,6 +154,15 @@ def add_examcells(examinfo: dict[str | int | list[str]], cells: list[list[str]])
   return cells
   
 def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
+  """
+  Excelデータを出力する
+
+  Parameters
+  ----
+  config: 設定データを示す構造体
+  cells: 試験項目を示すテーブルデータ
+  path: 出力パス
+  """
   START_ROW = 2
   wb = openpyxl.Workbook()
   ws = wb.worksheets[-1]
@@ -171,6 +217,18 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
   wb.save(path)
 
 def expandvars(text: str | list[list[str]], consts: dict[str,str]):
+  """
+  テーブルないし文字列内の変数データを展開する
+
+  Parameters
+  ----
+  text: テーブルないし文字列
+  consts: 定数を示す辞書データ
+
+  Returns
+  ----
+  試験項目を示すテーブルデータ。
+  """
   if type(text) is list:
     for i, item in enumerate(text):
       text[i] = expandvars(item, consts)
