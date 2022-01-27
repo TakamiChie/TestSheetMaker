@@ -1,0 +1,17 @@
+Headers:
+  TestResult:
+    PrintCount: 2
+    Title: "{}"
+    Labels:
+      - tester
+      - checker
+      - date
+      - result
+  TestItemsLabel:
+    - l
+    - m
+    - s
+  BackColor: "002060"
+  TextColor: "FFFFFF"
+Sheet:
+  Name: "TestSheet"

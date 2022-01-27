@@ -153,6 +153,58 @@ def add_examcells(examinfo: dict[str | int | list[str]], cells: list[list[str]])
         ii += 1
   return cells
   
+def rearrange_cells(headers: dict[Any], cells: list[list[str]], arrangeitems: list[str]) -> list[list[str]]:
+  """
+  テーブルを並び替える。なお、このメソッドは二回以上呼び出しできない。
+
+  Parameters
+  ----
+  headers: 設定構造体
+  cells: 試験項目を示すテーブルデータ。
+  arrangeitems: 並び順を示すリスト。以下の文字列が必ず含まれる必要がある
+    no: 試験番号列
+    itemname: 試験項目名列
+    content: 試験内容列
+    results: 試験結果列
+
+  Returns
+  ----
+  試験項目を示すテーブルデータ。
+  """
+  no  = cells[0].index("No")
+  ins = cells[0].index(headers["TestItemsLabel"][0])
+  ine = ins + len(headers["TestItemsLabel"]) - 1
+  cont= ine + 1
+  ress= cells[0].index(headers["TestResult"]["Labels"][0])
+  rese= ress + len(headers["TestResult"]["Labels"]) * headers["TestResult"]["PrintCount"]
+  ano = []
+  ain = []
+  acon= []
+  ares= []
+  for c in cells:
+    ano.append(c[no:no + 1])
+    ain.append(c[ins:ine + 1])
+    acon.append(c[cont:ress])
+    ares.append(c[ress:rese])
+  result = [[] for i in range(len(cells))]
+  for n in arrangeitems:
+    match n:
+      case "no":
+        for i, item in enumerate(ano):
+          result[i] += item
+      case "itemname":
+        for i, item in enumerate(ain):
+          result[i] += item
+      case "content":
+        for i, item in enumerate(acon):
+          result[i] += item
+      case "results":
+        for i, item in enumerate(ares):
+          result[i] += item
+      case _:
+        raise Exception("Unknown Item Name!")
+  return result
+
 def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
   """
   Excelデータを出力する
@@ -167,6 +219,7 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
   wb = openpyxl.Workbook()
   ws = wb.worksheets[-1]
   ws.title = config["Sheet"]["Name"]
+  noindex  = cells[0].index("No")
   # define styles
   headdesign = styles.PatternFill(patternType='solid', fgColor=config["Headers"]["BackColor"], bgColor=config["Headers"]["BackColor"])
   headfont = styles.Font(color=config["Headers"]["TextColor"])
@@ -186,7 +239,7 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
       cellobj.font = headfont
   # output cells
   for r, line in enumerate(cells):
-    print(f"> {line[0]}")
+    print(f"> {line[noindex]}")
     for c, cell in enumerate(line):
       cellobj = ws.cell(r + START_ROW, c + 1)
       # extension width
@@ -252,6 +305,8 @@ if __name__ == "__main__":
   cells = cells_normalization(config["Headers"]["TestItemsLabel"], exams)
   if "TestResult" in config["Headers"]:
     cells = add_examcells(config["Headers"]["TestResult"], cells)
+  if "Rearrange" in config:
+    cells = rearrange_cells(config["Headers"], cells, config["Rearrange"])
   if "Consts" in config:
     cells = expandvars(cells, config["Consts"])
   create_excel(config, cells, path=Path(args.out))
