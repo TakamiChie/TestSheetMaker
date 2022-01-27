@@ -121,10 +121,11 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
     for c in range(config["Headers"]["TestResult"]["PrintCount"]):
       for l in config["Headers"]["TestResult"]["Labels"]:
         cells[0].append(f"{c+1}:{l}")
+      ws.cell(1, c + len(cells[0])).value = f"{c+1}"
   # output cells
   for r, line in enumerate(cells):
     for c, cell in enumerate(line):
-      cellobj = ws.cell(r + 1, c + 1)
+      cellobj = ws.cell(r + 2, c + 1)
       # extension width
       calcsize = (len(cell if type(cell) is str else max(cell, key=len)) + 2) * 1.4
       dimensions = ws.column_dimensions[cellobj.column_letter]
@@ -173,6 +174,7 @@ if __name__ == "__main__":
 
   exams = generate_testlist(lines)
   cells = cells_normalization(config["Headers"]["TestItemsLabel"], exams)
-  cells = expandvars(cells, config["Consts"])
+  if "Consts" in config:
+    cells = expandvars(cells, config["Consts"])
   create_excel(config, cells, path=Path(args.out))
 
