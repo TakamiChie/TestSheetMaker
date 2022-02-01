@@ -5,7 +5,12 @@ from pathlib import Path
 
 import openpyxl
 import openpyxl.styles as styles
+import openpyxl.worksheet.worksheet as worksheet
+import openpyxl.cell.cell as cell
+import dictknife 
 import yaml
+
+START_ROW = 3
 
 def generate_testlist(lines: str) -> list[dict[list[str] | dict[str]]]:
   """
@@ -220,25 +225,36 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
   cells: 試験項目を示すテーブルデータ
   path: 出力パス
   """
-  START_ROW = 2
   wb = openpyxl.Workbook()
   ws = wb.worksheets[-1]
-  ws.title = config["Sheet"]["Name"]
   noindex  = cells[0].index("No")
   # define styles
   headdesign = styles.PatternFill(patternType='solid', fgColor=config["Headers"]["BackColor"], bgColor=config["Headers"]["BackColor"])
   headfont = styles.Font(color=config["Headers"]["TextColor"])
   side = styles.Side(style="thin", color="000000")
   border = styles.Border(side, side, side, side)
+  # insert caption
+  font = {}
+  for n, v in config["Sheet"].items():
+    match n:
+      case n if n.startswith("Font"): font[n[4].lower() + n[5:]] = v
+      case "Caption":
+        ws.cell(1, 1).value = v
+      case "Height":
+        ws.row_dimensions[1].height = v    
+      case "Name":
+        ws.title = v
+    if font != {}:
+      ws.cell(1, 1).font = styles.Font(**font)
   # fill header
   if "TestResult" in config["Headers"]:
     lc = len(config["Headers"]["TestResult"]["Labels"])
     for c in range(config["Headers"]["TestResult"]["PrintCount"]):
       sc = cells[0].index(config["Headers"]["TestResult"]["Labels"][0]) + c * lc + 1
       ec = sc + lc - 1
-      cellobj = ws.cell(1, sc)
+      cellobj = ws.cell(START_ROW - 1, sc)
       cellobj.value = config["Headers"]["TestResult"]["Title"].format(c+1)
-      ws.merge_cells(f"{cellobj.column_letter}1:{ws.cell(1, ec).column_letter}1")
+      ws.merge_cells(f"{cellobj.column_letter}{START_ROW - 1}:{ws.cell(START_ROW - 1, ec).column_letter}{START_ROW - 1}")
       cellobj.alignment = styles.Alignment(horizontal="center") 
       cellobj.fill = headdesign
       cellobj.font = headfont
@@ -301,30 +317,30 @@ def adjusttable(sheet: worksheet.Worksheet, replace_table: dict[Any]) -> None:
           sheet.column_dimensions[cell.column_letter].width = v
     return (font, align, newvalue)
   for c, col in enumerate(sheet.columns):
-    if col[1].value in replace_table:
+    if col[START_ROW - 2].value in replace_table:
       conf = dictknife.deepmerge(replace_table["Common"], replace_table[col[1].value])
     else:
       conf = replace_table["Common"]
     if conf != {}:
       if "Header" in conf:
         font, align, _ = applyProperties(conf["Header"], col[1])
-        col[1].font = styles.Font(**font)
-        col[1].alignment = styles.Alignment(**align)
-        if col[0].value != "":
+        col[START_ROW - 2].font = styles.Font(**font)
+        col[START_ROW - 2].alignment = styles.Alignment(**align)
+        if col[START_ROW - 1].value != "":
           if "TestResultHeader" in replace_table:
             for n, v in replace_table["TestResultHeader"].items():
               match n:
                 case "AlignHorizontal": align["horizontal"] = v
                 case "AlignVertical": align["vertical"] = v
                 case "Height": sheet.row_dimensions[2].height = v
-          col[0].font = styles.Font(**font)
-          col[0].alignment = styles.Alignment(**align)
+          col[START_ROW - 1].font = styles.Font(**font)
+          col[START_ROW - 1].alignment = styles.Alignment(**align)
       if "Body" in conf:
         cfont, calign, value = applyProperties(conf["Body"])
         font = styles.Font(**cfont)
         align= styles.Alignment(**calign)
         for r in range(sheet.max_row):
-          if r < 3: continue
+          if r < START_ROW: continue
           cellobj = sheet.cell(r + 1, c + 1)
           cellobj.font = font
           cellobj.alignment = align

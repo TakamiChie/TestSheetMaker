@@ -16,6 +16,10 @@ Headers:
   TextColor: "FFFFFF"
 Sheet:
   Name: "試験票"
+  Caption: "テスト一覧"
+  FontName: "游ゴシック"
+  FontSize: 14
+  Height: 18.75
 ColumnSet:
   Common:
     Header:
