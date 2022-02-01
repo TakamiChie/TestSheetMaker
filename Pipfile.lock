@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e1eec3e07b4f8b6fbb9ce82f83158d700be61af16e117e3837c94d561dbd4740"
+            "sha256": "c917c1f9ed435ed5910b3dbbd95bf87ce2fa91f4a11ca220e9c376db24ac8468"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,13 @@
         ]
     },
     "default": {
+        "dictknife": {
+            "hashes": [
+                "sha256:938caf14272f551467e174412f173038a21414810af5bf1316b2b0447bf2bc9c"
+            ],
+            "index": "pypi",
+            "version": "==0.13.0"
+        },
         "et-xmlfile": {
             "hashes": [
                 "sha256:8eb9e2bc2f8c97e37a2dc85a09ecdcdec9d8a396530a6d5a33b30b9a92da0c5c",

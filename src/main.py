@@ -270,9 +270,67 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
     if len(cells[0]) - len(line) > 0:
       for c in range(len(cells[0]) - len(line)):
         ws.cell(r + START_ROW, c + 1 + len(line)).border = border
-
+  if "ColumnSet" in config:
+    adjusttable(ws, config["ColumnSet"])
   if not path.parent.exists(): path.parent.mkdir()
   wb.save(path)
+
+def adjusttable(sheet: worksheet.Worksheet, replace_table: dict[Any]) -> None:
+  """
+  テーブルの書式を調整する
+
+  Parameters
+  ----
+  sheet: 調整対象のワークシート
+  replace_table: 置換用テーブル
+  """
+  def applyProperties(conf: dict[str,Any], cell: cell.Cell | None=None) -> tuple[dict[str,str],dict[str,str], str]:
+    font = {}
+    align = {}
+    newvalue = None
+    for n, v in conf.items():
+      match n:
+        case n if n.startswith("Font"): font[n[4].lower() + n[5:]] = v
+        case n if n.startswith("Align"): align[n[5].lower() + n[6:]] = v
+        case "Replace":
+          if cell: 
+            cell.value = v 
+          else: 
+            newvalue = v
+        case "Width":
+          sheet.column_dimensions[cell.column_letter].width = v
+    return (font, align, newvalue)
+  for c, col in enumerate(sheet.columns):
+    if col[1].value in replace_table:
+      conf = dictknife.deepmerge(replace_table["Common"], replace_table[col[1].value])
+    else:
+      conf = replace_table["Common"]
+    if conf != {}:
+      if "Header" in conf:
+        font, align, _ = applyProperties(conf["Header"], col[1])
+        col[1].font = styles.Font(**font)
+        col[1].alignment = styles.Alignment(**align)
+        if col[0].value != "":
+          if "TestResultHeader" in replace_table:
+            for n, v in replace_table["TestResultHeader"].items():
+              match n:
+                case "AlignHorizontal": align["horizontal"] = v
+                case "AlignVertical": align["vertical"] = v
+                case "Height": sheet.row_dimensions[2].height = v
+          col[0].font = styles.Font(**font)
+          col[0].alignment = styles.Alignment(**align)
+      if "Body" in conf:
+        cfont, calign, value = applyProperties(conf["Body"])
+        font = styles.Font(**cfont)
+        align= styles.Alignment(**calign)
+        for r in range(sheet.max_row):
+          if r < 3: continue
+          cellobj = sheet.cell(r + 1, c + 1)
+          cellobj.font = font
+          cellobj.alignment = align
+          if value: cellobj.value = value
+          
+  if "Height" in replace_table["HeaderRow"]: sheet.row_dimensions[3].height = replace_table["HeaderRow"]["Height"]
 
 def expandvars(text: str | list[list[str]], consts: dict[str,str]):
   """

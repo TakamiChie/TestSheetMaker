@@ -16,3 +16,64 @@ Headers:
   TextColor: "FFFFFF"
 Sheet:
   Name: "試験票"
+ColumnSet:
+  Common:
+    Header:
+      FontName: "游ゴシック"
+      FontSize: 10
+      FontColor: "FFFFFF"
+      AlignVertical: top
+      AlignHorizontal: center
+    Body:
+      FontName: "游ゴシック"
+      FontSize: 10
+      AlignVertical: top
+      AlignHorizontal: left
+      AlignWrapText: True
+  "No":
+    Header:
+      Replace: "No."
+      AlignHorizontal: left
+    Body:
+      Replace: "=ROW()-3"
+  ステップ:
+    Header:
+      AlignHorizontal: left
+      Replace: STEP
+  中項目:
+    Header:
+      AlignHorizontal: left
+  小項目:
+    Header:
+      AlignHorizontal: left
+  詳細項目:
+    Header:
+      AlignHorizontal: left
+  実施担当:
+    Header:
+      Replace: |-
+        実施
+        担当
+      Width: 4.25
+      AlignWrapText: true
+  確認担当:
+    Header:
+      Replace: |-
+        確認
+        担当
+      Width: 4.25
+      AlignWrapText: true
+  実施日:
+    Header:
+      Width: 9
+    Body:
+      FontSize: 8
+  結果:
+    Header:
+      Width: 4.25
+  TestResultHeader:
+    AlignVertical: center
+    AlignHorizontal: center
+    Height: 24
+  HeaderRow:
+    Height: 36
