@@ -326,13 +326,13 @@ def adjusttable(sheet: worksheet.Worksheet, replace_table: dict[Any]) -> None:
         font, align, _ = applyProperties(conf["Header"], col[START_ROW - 1])
         col[START_ROW - 1].font = styles.Font(**font)
         col[START_ROW - 1].alignment = styles.Alignment(**align)
-        if col[START_ROW - 2].value != "":
+        if col[START_ROW - 2].value:
           if "TestResultHeader" in replace_table:
             for n, v in replace_table["TestResultHeader"].items():
               match n:
                 case "AlignHorizontal": align["horizontal"] = v
                 case "AlignVertical": align["vertical"] = v
-                case "Height": sheet.row_dimensions[START_ROW - 2].height = v
+                case "Height": sheet.row_dimensions[START_ROW - 1].height = v
           col[START_ROW - 2].font = styles.Font(**font)
           col[START_ROW - 2].alignment = styles.Alignment(**align)
       if "Body" in conf:
