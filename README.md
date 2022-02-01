@@ -31,6 +31,10 @@ Headers:
   TextColor: "FFFFFF" ## ヘッダの文字色
 Sheet:
   Name: "試験票" ## 試験票のシート名
+  Caption: "テスト一覧" ## 試験票A1セルに追加する文字列
+  FontName: "游ゴシック" ## 〃文字フォント
+  FontSize: 14 ## 〃文字サイズ
+  Height: 18.75 ## 1行目の高さ
 Consts: ## 定数。名前: 値で定数を指定することができる。要らない場合は配下ごと削除
   Environment: "試験環境"
 Rearrange: ## 試験票の結果並び替えを行う場合ここに並びを指定。要らない場合は配下ごと削除
@@ -38,6 +42,32 @@ Rearrange: ## 試験票の結果並び替えを行う場合ここに並びを指
   - "itemname"
   - "content"
   - "results"
+ColumnSet: ## カラムの表示スタイル調整。要らない場合は配下ごと削除
+  Common: ## すべての列に共通の項目
+    Header: ## ヘッダ行の設定 
+      FontName: "游ゴシック" ## フォント名
+      FontSize: 10 ## フォントサイズ
+      FontColor: "FFFFFF" ## 文字色(ColumnSetを使うとこちらのテキスト色が優先されるのでTextColorを設定した場合はこちらも必須)
+      AlignVertical: top ## 縦位置
+      AlignHorizontal: center ## 横位置
+    Body: ## ヘッダ以外のすべてのセルに適用する設定
+      FontName: "游ゴシック"
+      FontSize: 10
+      AlignVertical: top
+      AlignHorizontal: left
+      AlignWrapText: True ## テキストの折り返しをおこなうかどうか
+  "No": ## No 列に設定する項目
+    Header:
+      Replace: "No." # ヘッダ行の文字列入れ替え
+      AlignHorizontal: left
+    Body:
+      Replace: "=ROW()-3" # ボディ部分の文字列入れ替え。数式も使用可能
+  TestResultHeader:
+    AlignVertical: center
+    AlignHorizontal: center
+    Height: 24 ## テスト結果行(2行目)の高さ
+  HeaderRow:
+    Height: 36 ## ヘッダ行(3行目)の高さ
 ```
 
 ### 試験票
