@@ -316,7 +316,9 @@ def adjusttable(sheet: worksheet.Worksheet, replace_table: dict[Any]) -> None:
         case "Width":
           sheet.column_dimensions[cell.column_letter].width = v
     return (font, align, newvalue)
+  print(">> Adjustment")
   for c, col in enumerate(sheet.columns):
+    print(f"> {col[START_ROW - 1].value}")
     if col[START_ROW - 1].value in replace_table:
       conf = dictknife.deepmerge(replace_table["Common"], replace_table[col[START_ROW - 1].value])
     else:
