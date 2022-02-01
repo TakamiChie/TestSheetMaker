@@ -344,9 +344,9 @@ def adjusttable(sheet: worksheet.Worksheet, replace_table: dict[Any]) -> None:
           cellobj = sheet.cell(r + 1, c + 1)
           cellobj.font = font
           cellobj.alignment = align
-          if value: cellobj.value = value
+          if value: cellobj.value = value        
           
-  if "Height" in replace_table["HeaderRow"]: sheet.row_dimensions[3].height = replace_table["HeaderRow"]["Height"]
+  if "HeaderRow" in replace_table and "Height" in replace_table["HeaderRow"]: sheet.row_dimensions[3].height = replace_table["HeaderRow"]["Height"]
 
 def expandvars(text: str | list[list[str]], consts: dict[str,str]):
   """
