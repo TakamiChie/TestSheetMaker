@@ -317,24 +317,24 @@ def adjusttable(sheet: worksheet.Worksheet, replace_table: dict[Any]) -> None:
           sheet.column_dimensions[cell.column_letter].width = v
     return (font, align, newvalue)
   for c, col in enumerate(sheet.columns):
-    if col[START_ROW - 2].value in replace_table:
-      conf = dictknife.deepmerge(replace_table["Common"], replace_table[col[1].value])
+    if col[START_ROW - 1].value in replace_table:
+      conf = dictknife.deepmerge(replace_table["Common"], replace_table[col[START_ROW - 1].value])
     else:
       conf = replace_table["Common"]
     if conf != {}:
       if "Header" in conf:
-        font, align, _ = applyProperties(conf["Header"], col[1])
-        col[START_ROW - 2].font = styles.Font(**font)
-        col[START_ROW - 2].alignment = styles.Alignment(**align)
-        if col[START_ROW - 1].value != "":
+        font, align, _ = applyProperties(conf["Header"], col[START_ROW - 1])
+        col[START_ROW - 1].font = styles.Font(**font)
+        col[START_ROW - 1].alignment = styles.Alignment(**align)
+        if col[START_ROW - 2].value != "":
           if "TestResultHeader" in replace_table:
             for n, v in replace_table["TestResultHeader"].items():
               match n:
                 case "AlignHorizontal": align["horizontal"] = v
                 case "AlignVertical": align["vertical"] = v
-                case "Height": sheet.row_dimensions[2].height = v
-          col[START_ROW - 1].font = styles.Font(**font)
-          col[START_ROW - 1].alignment = styles.Alignment(**align)
+                case "Height": sheet.row_dimensions[START_ROW - 2].height = v
+          col[START_ROW - 2].font = styles.Font(**font)
+          col[START_ROW - 2].alignment = styles.Alignment(**align)
       if "Body" in conf:
         cfont, calign, value = applyProperties(conf["Body"])
         font = styles.Font(**cfont)
@@ -345,8 +345,8 @@ def adjusttable(sheet: worksheet.Worksheet, replace_table: dict[Any]) -> None:
           cellobj.font = font
           cellobj.alignment = align
           if value: cellobj.value = value        
-          
-  if "HeaderRow" in replace_table and "Height" in replace_table["HeaderRow"]: sheet.row_dimensions[3].height = replace_table["HeaderRow"]["Height"]
+
+  if "HeaderRow" in replace_table and "Height" in replace_table["HeaderRow"]: sheet.row_dimensions[START_ROW].height = replace_table["HeaderRow"]["Height"]
 
 def expandvars(text: str | list[list[str]], consts: dict[str,str]):
   """
