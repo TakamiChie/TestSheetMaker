@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 import re
 from typing import Any
 from pathlib import Path
+import json
 
 import openpyxl
 import openpyxl.styles as styles
@@ -12,13 +13,14 @@ import yaml
 
 START_ROW = 3
 
-def generate_testlist(lines: str) -> list[dict[list[str] | dict[str]]]:
+def generate_testlist(lines: str, base: str=".") -> list[dict[list[str] | dict[str]]]:
   """
   Markdownデータより、試験項目用リストを作成する。
   
   Parameters
   ----
   lines: 試験項目データを含むMarkdownデータ
+  basedir: プリプロセッサ実行時の基準ディレクトリパス
 
   Returns
   ----
@@ -31,6 +33,22 @@ def generate_testlist(lines: str) -> list[dict[list[str] | dict[str]]]:
   currenttest = {}
   section = ""
   textbuf = []
+  basedir = Path(base)
+  text = ""
+  for line in lines.split("\n"):
+    if m := re.match(r"\s+&(\w+)\((.*?)\)$", line):
+      # preprocessor
+      argument = json.loads(m[2])
+      match m[1]:
+        case "include":
+          with open(basedir / argument["name"], mode="r", encoding="utf-8") as f:
+            s = f.read()
+            for n, v in argument.items():
+              s = s.replace(f"//**{n}**//", v)
+            text += s
+    else:
+      text += f"{line}\n"
+  lines = text
   for line in lines.split("\n"):
     if m := re.match(r"^\s*(#+)\s*(.*)$", line):
       # change item

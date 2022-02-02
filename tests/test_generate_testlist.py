@@ -156,3 +156,37 @@ class TestGenerateTestlist(unittest.TestCase):
     ccc"""
     with self.assertRaises(Exception):
       main.generate_testlist(testdata)
+
+  def test_include(self):
+    testdata = """
+    # test
+    ## testb
+    ### testc
+    :: aaa
+    bbb
+    :: bbb
+    ccc
+    &include({"name":"tests/test_include.md","test":"bbb"})"""
+    data = main.generate_testlist(testdata)
+    self.assertEqual(len(data), 2)
+    self.assertEqual(data[0]["items"], ["test", "testb", "testc"])
+    self.assertEqual(data[0]["exams"], {"aaa": ["bbb"], "bbb": ["ccc"]})
+    self.assertEqual(data[1]["items"], ["test", "teste", "testf"])
+    self.assertEqual(data[1]["exams"], {"aaa": ["bbb"], "bbb": ["ccc"]})
+
+  def test_include_basedir(self):
+    testdata = """
+    # test
+    ## testb
+    ### testc
+    :: aaa
+    bbb
+    :: bbb
+    ccc
+    &include({"name":"test_include.md","test":"bbb"})"""
+    data = main.generate_testlist(testdata, "tests")
+    self.assertEqual(len(data), 2)
+    self.assertEqual(data[0]["items"], ["test", "testb", "testc"])
+    self.assertEqual(data[0]["exams"], {"aaa": ["bbb"], "bbb": ["ccc"]})
+    self.assertEqual(data[1]["items"], ["test", "teste", "testf"])
+    self.assertEqual(data[1]["exams"], {"aaa": ["bbb"], "bbb": ["ccc"]})
