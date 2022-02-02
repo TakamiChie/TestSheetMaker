@@ -36,7 +36,7 @@ def generate_testlist(lines: str, base: str=".") -> list[dict[list[str] | dict[s
   basedir = Path(base)
   text = ""
   for line in lines.split("\n"):
-    if m := re.match(r"\s+&(\w+)\((.*?)\)$", line):
+    if m := re.match(r"\s*&(\w+)\((.*?)\)$", line):
       # preprocessor
       argument = json.loads(m[2])
       match m[1]:
@@ -400,7 +400,7 @@ if __name__ == "__main__":
   with open(args.config, mode="r", encoding="utf-8") as f: config = yaml.safe_load(f)
   with open(args.tests, mode="r", encoding="utf-8") as f: lines = f.read()
 
-  exams = generate_testlist(lines)
+  exams = generate_testlist(lines, base=Path(args.tests).parent)
   cells = cells_normalization(config["Headers"]["TestItemsLabel"], exams)
   if "TestResult" in config["Headers"]:
     cells = add_examcells(config["Headers"]["TestResult"], cells)
