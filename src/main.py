@@ -364,7 +364,11 @@ def adjusttable(sheet: worksheet.Worksheet, replace_table: dict[Any]) -> None:
           cellobj = sheet.cell(r + 1, c + 1)
           cellobj.font = font
           cellobj.alignment = align
-          if value: cellobj.value = value        
+          if value:
+            nv = value.replace("%%", cellobj.value) if cellobj else value
+            if nv.startswith("@"):
+              nv = eval(nv[1:])
+            cellobj.value = nv
 
   if "HeaderRow" in replace_table and "Height" in replace_table["HeaderRow"]: sheet.row_dimensions[START_ROW].height = replace_table["HeaderRow"]["Height"]
 
