@@ -304,10 +304,7 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
     if len(cells[0]) - len(line) > 0:
       for c in range(len(cells[0]) - len(line)):
         ws.cell(r + START_ROW, c + 1 + len(line)).border = border
-  if "ColumnSet" in config:
-    adjusttable(ws, config["ColumnSet"])
-  if not path.parent.exists(): path.parent.mkdir()
-  wb.save(path)
+  return wb
 
 def adjusttable(sheet: worksheet.Worksheet, replace_table: dict[Any]) -> None:
   """
@@ -403,6 +400,7 @@ if __name__ == "__main__":
 
   with open(args.config, mode="r", encoding="utf-8") as f: config = yaml.safe_load(f)
   with open(args.tests, mode="r", encoding="utf-8") as f: lines = f.read()
+  path = Path(args.out)
 
   exams = generate_testlist(lines, base=Path(args.tests).parent)
   cells = cells_normalization(config["Headers"]["TestItemsLabel"], exams)
@@ -412,6 +410,10 @@ if __name__ == "__main__":
     cells = rearrange_cells(config["Headers"], cells, config["Rearrange"])
   if "Consts" in config:
     cells = expandvars(cells, config["Consts"])
-  create_excel(config, cells, path=Path(args.out))
+  wb = create_excel(config, cells, path=path)
+  if "ColumnSet" in config:
+    adjusttable(wb.worksheets[-1], config["ColumnSet"])
+  if not path.parent.exists(): path.parent.mkdir()
+  wb.save(path)
   print("> finished!")
 
