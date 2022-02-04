@@ -233,7 +233,7 @@ def rearrange_cells(headers: dict[Any], cells: list[list[str]], arrangeitems: li
         raise Exception("Unknown Item Name!")
   return result
 
-def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
+def create_excel(config:dict[Any], cells: list[list[str]]) -> None:
   """
   Excelデータを出力する
 
@@ -241,7 +241,6 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
   ----
   config: 設定データを示す構造体
   cells: 試験項目を示すテーブルデータ
-  path: 出力パス
 
   Returns
   ----
@@ -414,7 +413,7 @@ if __name__ == "__main__":
     cells = rearrange_cells(config["Headers"], cells, config["Rearrange"])
   if "Consts" in config:
     cells = expandvars(cells, config["Consts"])
-  wb = create_excel(config, cells, path=path)
+  wb = create_excel(config, cells)
   if "ColumnSet" in config:
     adjusttable(wb.worksheets[-1], config["ColumnSet"])
   if not path.parent.exists(): path.parent.mkdir()
