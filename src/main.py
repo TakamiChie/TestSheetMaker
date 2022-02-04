@@ -242,6 +242,10 @@ def create_excel(config:dict[Any], cells: list[list[str]], path: Path) -> None:
   config: 設定データを示す構造体
   cells: 試験項目を示すテーブルデータ
   path: 出力パス
+
+  Returns
+  ----
+  Excelワークブック
   """
   wb = openpyxl.Workbook()
   ws = wb.worksheets[-1]
